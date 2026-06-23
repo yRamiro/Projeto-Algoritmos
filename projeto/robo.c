@@ -8,6 +8,9 @@
 #define RESET "\033[0m"
 #define TAMANHO 20 
 
+// Estratégia utilizada: Como o prêmio está na posição [0][0], a estratégia utilizada foi a prioridade para movimentos para a esquerda e para cima, pois ambos se aproximam do prêmio.
+
+
 // VARIÁVEIS
 char tabuleiro[TAMANHO][TAMANHO];
 int n = TAMANHO; // variável de controle 
@@ -28,7 +31,7 @@ int main () {
     inicializarMundo();
     configInicial();
     imprimirMundo();
-    Sleep(700);
+    Sleep(500);
     system("cls");
     while (!fimdeJogo()) {
         validacaodeMovimento();
@@ -39,7 +42,7 @@ int main () {
         if (fimdeJogo()) 
             break;
         else {
-        Sleep(700);
+        Sleep(500);
         system("cls"); 
         }
     }
@@ -49,7 +52,7 @@ int main () {
 void inicializarMundo() { // função de leitura 
     FILE*arquivo; 
     int i, j; 
-    arquivo = fopen("mundo1.txt", "r"); // leitura do mundo 
+    arquivo = fopen("mundo.txt", "r"); // leitura do mundo 
     
     if (arquivo == NULL) 
         printf("Arquivo nao encontrado! \n");
