@@ -37,8 +37,6 @@ int main () {
         validacaodeMovimento();
         move();
         imprimirMundo();
-        printf("\nRodada numero: %d\n", rodada); 
-        printf("O robo esta na linha %d e na coluna %d\n", roboLinha, roboColuna);
         if (fimdeJogo()) 
             break;
         else {
@@ -85,6 +83,10 @@ void imprimirMundo() { // impressão da matriz (labirinto)
             }
         printf("\n");
     } 
+
+    printf("\nRodada numero: %d\n", rodada); 
+    printf("O robo esta na linha %d e na coluna %d\n", roboLinha, roboColuna);
+    printf("Distancia ate o premio: %.2f\n", distancia);
 }
 
 bool fimdeJogo() { // condições para o jogo acabar
@@ -105,7 +107,7 @@ int validacaodeMovimento() { // função para validar e escolher a melhor opçã
     bool valid;    
     n = 0;
 
-    if (tabuleiro[roboLinha - 1][roboColuna] == '$' || tabuleiro[roboLinha][roboColuna - 1] == '$') {
+    if (tabuleiro[roboLinha - 1][roboColuna] == '$' || tabuleiro[roboLinha][roboColuna - 1] == '$') { // pegar o prêmio caso esteja em uma casa adjacente
         n = 4;
         return 0;
     }
@@ -139,6 +141,7 @@ int move() { // função para movimento
             tabuleiro[roboLinha][novaColuna] = 'R';
             roboColuna = novaColuna;
             novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
+            distancia = novaDistancia;
             rodada++;
             break; 
 
@@ -148,6 +151,7 @@ int move() { // função para movimento
             tabuleiro[novaLinha][roboColuna] = 'R'; 
             roboLinha = novaLinha;
             novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
+            distancia = novaDistancia;
             rodada++;
             break; 
 
@@ -157,6 +161,7 @@ int move() { // função para movimento
             tabuleiro[roboLinha][novaColuna] = 'R'; 
             roboColuna = novaColuna; 
             novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
+            distancia = novaDistancia;
             rodada++;
             break; 
 
@@ -166,16 +171,18 @@ int move() { // função para movimento
             tabuleiro[novaLinha][roboColuna] = 'R'; 
             roboLinha = novaLinha;
             novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
+            distancia = novaDistancia;
             rodada++;
             break;
         
-            case 4: 
+            case 4: // robo pega o prêmio se estiver em uma casa adjacente
             novaColuna = 0; 
             novaLinha = 0; 
             tabuleiro[roboLinha][roboColuna] = '#';  
             tabuleiro[novaLinha][novaColuna] = 'R';  
             roboLinha = novaLinha; 
             roboColuna = novaColuna; 
+            distancia = 0;
             rodada++; 
             break;
         } 
