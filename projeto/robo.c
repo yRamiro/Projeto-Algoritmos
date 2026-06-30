@@ -1,7 +1,6 @@
 #include<stdio.h> 
 #include<stdlib.h> 
 #include<stdbool.h>
-#include<math.h>
 #include<windows.h> 
 
 #define VERDE "\033[32m"
@@ -16,19 +15,24 @@ char tabuleiro[TAMANHO][TAMANHO];
 int n = TAMANHO; // variável de controle 
 int rodada = 1;  // contador de rodadas
 int roboLinha, roboColuna; // posição do robo
-float distancia = 0;
+int distancia = 0;
 
 
 // FUNÇÕES
-void inicializarMundo(); 
+bool inicializarMundo(); 
 bool configInicial();
 void imprimirMundo(); 
 bool fimdeJogo();
 int validacaodeMovimento();
 int move(); 
+int getRoboLinha(); 
+int getRoboColuna();
 
 int main () { 
     inicializarMundo();
+    if (inicializarMundo() == false) 
+        return 0; // sai da função caso o arquivo não for encontrado
+    
     configInicial();
     imprimirMundo();
     Sleep(500);
@@ -46,20 +50,23 @@ int main () {
     }
 }
 
-
-void inicializarMundo() { // função de leitura 
+bool inicializarMundo() { // função de leitura 
     FILE*arquivo; 
     int i, j; 
-    arquivo = fopen("mundo.txt", "r"); // leitura do mundo 
+    arquivo = fopen("mundo2.txt", "r"); // leitura do mundo 
     
-    if (arquivo == NULL) 
+    if (arquivo == NULL) {
         printf("Arquivo nao encontrado! \n");
+        return false;
+
+    } 
 
     for (i = 0; i < n; i++) { 
         for (j = 0; j < n; j++) 
             fscanf(arquivo, " %c", &tabuleiro[i][j]); // lê os carecteres e salva na matriz
     } 
     fclose(arquivo);
+    return true;
 }
 
 bool configInicial() { // definiçao e leitura das posições iniciais
@@ -67,9 +74,11 @@ bool configInicial() { // definiçao e leitura das posições iniciais
     roboLinha = TAMANHO - 1;
     roboColuna = TAMANHO - 1;
     tabuleiro[roboLinha][roboColuna] = 'R';
-    
-    // distancia = raizquadrada[(x2 - x1)² + (y2 - y1)²], entretanto não é preciso realizar a subtração pois x1 e y1 sempre serão 0.
-    distancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
+    roboLinha = getRoboLinha(); 
+    roboColuna = getRoboColuna();
+
+    // distancia Mnahattan: d = |x1 - x2| + |y1 - y2|, entretanto não é preciso realizar a subtração pois x1 e y1 sempre serão 0 (posição do prêmio).
+    distancia = roboLinha + roboColuna;
 }
 
 void imprimirMundo() { // impressão da matriz (labirinto)
@@ -86,7 +95,7 @@ void imprimirMundo() { // impressão da matriz (labirinto)
 
     printf("\nRodada numero: %d\n", rodada); 
     printf("O robo esta na linha %d e na coluna %d\n", roboLinha, roboColuna);
-    printf("Distancia ate o premio: %.2f\n", distancia);
+    printf("Distancia ate o premio: %d movimentos\n", distancia);
 }
 
 bool fimdeJogo() { // condições para o jogo acabar
@@ -112,16 +121,16 @@ int validacaodeMovimento() { // função para validar e escolher a melhor opçã
         return 0;
     }
     
-    if (tabuleiro[roboLinha][roboColuna - 1] != '_' || roboColuna - 1 < 0) { // invalida movimentos para obstáculos e para fora do tabuleiro
+    if (tabuleiro[roboLinha][roboColuna - 1] != '_' || roboColuna - 1 < 0 || roboColuna + 1 < 0) { // invalida movimentos para obstáculos e para fora do tabuleiro
         n = 1;
         
         if (n == 1 && tabuleiro[roboLinha - 1][roboColuna] != '_' || roboLinha - 1 < 0) {
             n = 2;
             
-            if (n == 2 && tabuleiro[roboLinha][roboColuna + 1] != '_' || roboColuna + 1 < 0) {
+            if (n == 2 && tabuleiro[roboLinha][roboColuna + 1] != '_' || roboColuna + 1 < 20) {
                 n = 3;
 
-                if (n == 3 && tabuleiro[roboLinha + 1][roboColuna] != '_' || roboLinha + 1 < 0) {
+                if (n == 3 && tabuleiro[roboLinha + 1][roboColuna] != '_' || roboLinha + 1 < 20) {
                     printf("\nNao ha movimentos validos disponiveis!.");
                 }
             }
@@ -132,16 +141,14 @@ int validacaodeMovimento() { // função para validar e escolher a melhor opçã
 
 
 int move() { // função para movimento
-    int novaLinha, novaColuna; 
-    float novaDistancia;    
+    int novaLinha, novaColuna;  
     switch(n) {
             case 0: // robo anda para a esquerda 
             novaColuna = roboColuna - 1; 
             tabuleiro[roboLinha][roboColuna] = '#';
             tabuleiro[roboLinha][novaColuna] = 'R';
             roboColuna = novaColuna;
-            novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
-            distancia = novaDistancia;
+            distancia = roboColuna + roboLinha;
             rodada++;
             break; 
 
@@ -150,8 +157,7 @@ int move() { // função para movimento
             tabuleiro[roboLinha][roboColuna] = '#'; 
             tabuleiro[novaLinha][roboColuna] = 'R'; 
             roboLinha = novaLinha;
-            novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
-            distancia = novaDistancia;
+            distancia = roboColuna + roboLinha;
             rodada++;
             break; 
 
@@ -160,8 +166,7 @@ int move() { // função para movimento
             tabuleiro[roboLinha][roboColuna] = '#';
             tabuleiro[roboLinha][novaColuna] = 'R'; 
             roboColuna = novaColuna; 
-            novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
-            distancia = novaDistancia;
+            distancia = roboColuna + roboLinha;
             rodada++;
             break; 
 
@@ -170,8 +175,7 @@ int move() { // função para movimento
             tabuleiro[roboLinha][roboColuna] = '#'; 
             tabuleiro[novaLinha][roboColuna] = 'R'; 
             roboLinha = novaLinha;
-            novaDistancia = sqrtf(pow(roboLinha, 2) + pow(roboColuna,2));
-            distancia = novaDistancia;
+            distancia = roboColuna + roboLinha;
             rodada++;
             break;
         
@@ -186,4 +190,12 @@ int move() { // função para movimento
             rodada++; 
             break;
         } 
-    }
+    } 
+
+int getRoboLinha() {
+	return roboLinha;
+}
+
+int getRoboColuna(){
+	return roboColuna;
+}
