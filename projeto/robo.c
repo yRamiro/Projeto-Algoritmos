@@ -127,10 +127,10 @@ int validacaodeMovimento() { // função para validar e escolher a melhor opçã
         if (n == 1 && tabuleiro[roboLinha - 1][roboColuna] != '_' || roboLinha - 1 < 0) {
             n = 2;
             
-            if (n == 2 && tabuleiro[roboLinha][roboColuna + 1] != '_' || roboColuna + 1 < 20) {
+            if (n == 2 && tabuleiro[roboLinha][roboColuna + 1] != '_' || roboColuna + 1 > 19) {
                 n = 3;
 
-                if (n == 3 && tabuleiro[roboLinha + 1][roboColuna] != '_' || roboLinha + 1 < 20) {
+                if (n == 3 && tabuleiro[roboLinha + 1][roboColuna] != '_' || roboLinha + 1 > 19) {
                     printf("\nNao ha movimentos validos disponiveis!.");
                 }
             }
